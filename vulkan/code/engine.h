@@ -4,15 +4,19 @@
 #include <GLFW/glfw3.h>
 
 namespace vulkan {
-class Engine {
-public:
-    void run();
+	class Engine {
+	public:
+		void run();
 
-private:
-    void initVulkan();
-    void mainLoop();
-    void cleanup();
+	private:
+		void initWindow();
+		void initVulkan();
+		void mainLoop();
+		void cleanup();
+		void createInstance();
 
-    GLFWwindow* window = nullptr;
-};
+	private:
+		GLFWwindow* window = nullptr;
+		VkInstance instance;
+	};
 } // namespace vulkan

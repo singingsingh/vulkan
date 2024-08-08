@@ -21,12 +21,18 @@
     <ClCompile Include="code\engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="code\utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="code\config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="code\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
