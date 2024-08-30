@@ -17,11 +17,12 @@ namespace vulkan {
 	}
 
 	void Engine::initVulkan() {
-		createInstance();
 		printExtensionsAndLayersInfo();
+		printRequiredExtension();
 		if (enableValidationLayers && checkValidationLayerSupport() == false) {
 			throw std::runtime_error("required validation layer not found.");
 		}
+		createInstance();
 	}
 
 	void Engine::mainLoop() {
@@ -52,12 +53,9 @@ namespace vulkan {
 		instance_create_info.enabledLayerCount = 0;
 		instance_create_info.pApplicationInfo = &application_info;
 
-		uint32_t glfwExtensionCount = 0;
-		const char** glfwExtensions;
-
-		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
-		instance_create_info.enabledExtensionCount = glfwExtensionCount;
-		instance_create_info.ppEnabledExtensionNames = glfwExtensions;
+		auto extensions = getRequiredExtension();
+		instance_create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+		instance_create_info.ppEnabledExtensionNames = extensions.data();
 
 		if (vkCreateInstance(&instance_create_info, nullptr, &instance) != VK_SUCCESS) {
 			throw std::runtime_error("Cannot create instance");

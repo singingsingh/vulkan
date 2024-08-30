@@ -58,4 +58,25 @@ namespace vulkan {
 		vkEnumerateInstanceLayerProperties(&layer_count, layer_properties.data());
 		return layer_properties;
 	}
+
+	std::vector<const char*> getRequiredExtension() {
+		uint32_t glfwExtensionCount = 0;
+		const char** glfwExtensions = nullptr;
+		glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
+
+		std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
+
+		if (enableValidationLayers) {
+			extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+		}
+
+		return extensions;
+	}
+	void printRequiredExtension() {
+		std::vector<const char*> required_extensions = getRequiredExtension();
+		std::cout << "Required extension : ";
+		for (const char* extension : required_extensions) {
+			std::cout << "\n\t" << extension;
+		}
+	}
 } // namespace vulkan
