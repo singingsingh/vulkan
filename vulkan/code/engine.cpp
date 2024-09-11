@@ -17,13 +17,31 @@ namespace vulkan {
 	}
 
 	void Engine::initVulkan() {
-		printExtensionsAndLayersInfo();
-		printRequiredExtension();
+		//printExtensionsAndLayersInfo();
+		//printRequiredExtension();
 		if (enableValidationLayers && checkValidationLayerSupport() == false) {
 			throw std::runtime_error("required validation layer not found.");
 		}
 		createInstance();
 		setupDebugMessenger();
+		pickPhysicalDevice();
+	}
+
+	void Engine::pickPhysicalDevice() {
+		uint32_t device_count = 0;
+		vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
+		std::vector<VkPhysicalDevice> devices(device_count);
+		vkEnumeratePhysicalDevices(instance, &device_count, devices.data());
+		printPhysicalDeviceInfo(devices);
+		for (const auto& device : devices) {
+			if (isDeviceSuitable(device)) {
+				physical_device = device;
+				break;
+			}
+		}
+		if (physical_device == VK_NULL_HANDLE) {
+			throw std::runtime_error("failed to find a suitable GPU!");
+		}
 	}
 
 	void Engine::mainLoop() {

@@ -96,4 +96,22 @@ namespace vulkan {
 			func(instance, debugMessenger, pAllocator);
 		}
 	}
+
+	void printPhysicalDeviceInfo(std::vector<VkPhysicalDevice> devices) {
+		std::cout << "Found " << devices.size() << " physical devices";
+		for (const VkPhysicalDevice& device : devices) {
+			VkPhysicalDeviceProperties device_properties{};
+			vkGetPhysicalDeviceProperties(device, &device_properties);
+			std::cout << "\n\t" << device_properties.deviceName << " " << device_properties.deviceType;
+		}
+	}
+	bool isDeviceSuitable(const VkPhysicalDevice device) {
+		VkPhysicalDeviceProperties deviceProperties;
+		VkPhysicalDeviceFeatures deviceFeatures;
+		vkGetPhysicalDeviceProperties(device, &deviceProperties);
+		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+		return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
+			deviceFeatures.geometryShader;
+	}
 } // namespace vulkan

@@ -13,4 +13,6 @@ namespace vulkan {
 	void printRequiredExtension();
 	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
 	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
+	void printPhysicalDeviceInfo(std::vector<VkPhysicalDevice> devices);
+	bool isDeviceSuitable(const VkPhysicalDevice device);
 } // namespace vulkan
