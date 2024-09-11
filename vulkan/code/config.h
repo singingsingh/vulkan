@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include <vector>
+#include <optional>
 
 namespace vulkan {
 const uint16_t WIDTH = 800;
@@ -15,5 +16,9 @@ const bool enableValidationLayers = false;
 #else
 const bool enableValidationLayers = true;
 #endif
+
+struct QueueFamilyIndices {
+    std::optional<uint32_t> graphicsFamily;
+};
 
 } // namespace vulkan

@@ -32,7 +32,7 @@ namespace vulkan {
 		vkEnumeratePhysicalDevices(instance, &device_count, nullptr);
 		std::vector<VkPhysicalDevice> devices(device_count);
 		vkEnumeratePhysicalDevices(instance, &device_count, devices.data());
-		printPhysicalDeviceInfo(devices);
+		//printPhysicalDeviceInfo(devices);
 		for (const auto& device : devices) {
 			if (isDeviceSuitable(device)) {
 				physical_device = device;
@@ -42,6 +42,7 @@ namespace vulkan {
 		if (physical_device == VK_NULL_HANDLE) {
 			throw std::runtime_error("failed to find a suitable GPU!");
 		}
+		printPhysicalDeviceInfo(physical_device);
 	}
 
 	void Engine::mainLoop() {

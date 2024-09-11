@@ -3,7 +3,6 @@
 #include <cstring>
 
 #include "utils.h"
-#include "config.h"
 
 namespace vulkan {
 	void printExtensionsAndLayersInfo() {
@@ -105,13 +104,52 @@ namespace vulkan {
 			std::cout << "\n\t" << device_properties.deviceName << " " << device_properties.deviceType;
 		}
 	}
+
 	bool isDeviceSuitable(const VkPhysicalDevice device) {
 		VkPhysicalDeviceProperties deviceProperties;
 		VkPhysicalDeviceFeatures deviceFeatures;
-		vkGetPhysicalDeviceProperties(device, &deviceProperties);
+		vkGetPhysicalDeviceProperties(device, &deviceProperties);	
 		vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
 
-		return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU &&
-			deviceFeatures.geometryShader;
+		if (deviceProperties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+			return false;
+		}
+		if (deviceFeatures.geometryShader == VK_FALSE) {
+			return false;
+		}
+
+		QueueFamilyIndices indices = findQueueFamilies(device);
+		if (indices.graphicsFamily.has_value() == false) {
+			return false;
+		}
+
+		return true;
+	}
+
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+		QueueFamilyIndices indices;
+		
+		uint32_t queueFamilyCount = 0;
+		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
+
+		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
+		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, queueFamilies.data());
+
+		int i = 0;
+		for (const auto& queueFamily : queueFamilies) {
+			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+				indices.graphicsFamily = i;
+				break;
+			}
+			i++;
+		}
+
+		return indices;
+	}
+
+	void printPhysicalDeviceInfo(const VkPhysicalDevice& device) {
+		VkPhysicalDeviceProperties device_properties{};
+		vkGetPhysicalDeviceProperties(device, &device_properties);
+		std::cout << "Selected GPU : " << device_properties.deviceName << " " << device_properties.deviceType;
 	}
 } // namespace vulkan
