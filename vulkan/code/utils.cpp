@@ -77,6 +77,7 @@ namespace vulkan {
 		for (const char* extension : required_extensions) {
 			std::cout << "\n\t" << extension;
 		}
+		std::cout << "\n";
 	}
 
 	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {

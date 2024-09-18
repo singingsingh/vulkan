@@ -18,6 +18,7 @@ namespace vulkan {
 		void createInstance();
 		void setupDebugMessenger();
 		void pickPhysicalDevice();
+		void createLogicalDevice();
 
 		static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -30,5 +31,8 @@ namespace vulkan {
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkPhysicalDevice physical_device = VK_NULL_HANDLE;
+		VkPhysicalDeviceFeatures deviceFeatures{};
+		VkDevice device;
+		VkQueue graphicsQueue;
 	};
 } // namespace vulkan
