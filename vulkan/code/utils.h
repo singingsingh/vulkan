@@ -17,6 +17,6 @@ namespace vulkan {
 	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 	void printPhysicalDeviceInfo(std::vector<VkPhysicalDevice> devices);
 	void printPhysicalDeviceInfo(const VkPhysicalDevice& devices);
-	bool isDeviceSuitable(const VkPhysicalDevice device);
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+	bool isDeviceSuitable(const VkPhysicalDevice device, VkSurfaceKHR surface);
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface);
 } // namespace vulkan

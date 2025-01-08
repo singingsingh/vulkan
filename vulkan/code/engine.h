@@ -16,6 +16,7 @@ namespace vulkan {
 		void mainLoop();
 		void cleanup();
 		void createInstance();
+		void createSurface();
 		void setupDebugMessenger();
 		void pickPhysicalDevice();
 		void createLogicalDevice();
@@ -34,5 +35,7 @@ namespace vulkan {
 		VkPhysicalDeviceFeatures deviceFeatures{};
 		VkDevice device;
 		VkQueue graphicsQueue;
+		VkQueue presentQueue;
+		VkSurfaceKHR surface;
 	};
 } // namespace vulkan

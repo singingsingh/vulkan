@@ -106,7 +106,7 @@ namespace vulkan {
 		}
 	}
 
-	bool isDeviceSuitable(const VkPhysicalDevice device) {
+	bool isDeviceSuitable(const VkPhysicalDevice device, VkSurfaceKHR surface) {
 		VkPhysicalDeviceProperties deviceProperties;
 		VkPhysicalDeviceFeatures deviceFeatures;
 		vkGetPhysicalDeviceProperties(device, &deviceProperties);	
@@ -119,7 +119,7 @@ namespace vulkan {
 			return false;
 		}
 
-		QueueFamilyIndices indices = findQueueFamilies(device);
+		QueueFamilyIndices indices = findQueueFamilies(device, surface);
 		if (indices.graphicsFamily.has_value() == false) {
 			return false;
 		}
@@ -127,8 +127,9 @@ namespace vulkan {
 		return true;
 	}
 
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR surface) {
 		QueueFamilyIndices indices;
+
 		
 		uint32_t queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
@@ -138,6 +139,13 @@ namespace vulkan {
 
 		int i = 0;
 		for (const auto& queueFamily : queueFamilies) {
+			VkBool32 presentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+
+			if (presentSupport) {
+				indices.presentFamily = i;
+			}
+
 			if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
 				indices.graphicsFamily = i;
 				break;

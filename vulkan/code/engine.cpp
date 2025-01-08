@@ -1,8 +1,10 @@
-#include <stdexcept>
+#include "engine.h"
 
+#include <stdexcept>
 #include <cassert>
 
-#include "engine.h"
+#include <set>
+
 #include "config.h"
 #include "utils.h"
 
@@ -23,6 +25,7 @@ namespace vulkan {
 			throw std::runtime_error("required validation layer not found.");
 		}
 		createInstance();
+		createSurface();
 		setupDebugMessenger();
 		pickPhysicalDevice();
 		createLogicalDevice();
@@ -35,7 +38,7 @@ namespace vulkan {
 		vkEnumeratePhysicalDevices(instance, &device_count, devices.data());
 		//printPhysicalDeviceInfo(devices);
 		for (const auto& device : devices) {
-			if (isDeviceSuitable(device)) {
+			if (isDeviceSuitable(device, surface)) {
 				physical_device = device;
 				break;
 			}
@@ -47,18 +50,26 @@ namespace vulkan {
 	}
 
 	void Engine::createLogicalDevice() {
-		QueueFamilyIndices queue_family_indices = findQueueFamilies(physical_device);
-		VkDeviceQueueCreateInfo device_queue_create_info{};
-		device_queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-		device_queue_create_info.queueFamilyIndex = queue_family_indices.graphicsFamily.value();
-		device_queue_create_info.queueCount = 1;
+		QueueFamilyIndices queue_family_indices = findQueueFamilies(physical_device, surface);
+
+		std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+		std::set<uint32_t> uniqueQueueFamilies = { queue_family_indices.graphicsFamily.value(), queue_family_indices.presentFamily.value() };
 		float queuePriority = 1.0f;
-		device_queue_create_info.pQueuePriorities = &queuePriority;
+
+		for (uint32_t queueFamily : uniqueQueueFamilies) {
+			VkDeviceQueueCreateInfo device_queue_create_info{};
+			device_queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+			device_queue_create_info.queueFamilyIndex = queue_family_indices.graphicsFamily.value();
+			device_queue_create_info.queueCount = 1;
+			device_queue_create_info.pQueuePriorities = &queuePriority;
+			queueCreateInfos.push_back(device_queue_create_info);
+		}
+
 
 		VkDeviceCreateInfo device_create_info{};
 		device_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-		device_create_info.pQueueCreateInfos = &device_queue_create_info;
-		device_create_info.queueCreateInfoCount = 1;
+		device_create_info.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+		device_create_info.pQueueCreateInfos = queueCreateInfos.data();
 		device_create_info.pEnabledFeatures = &deviceFeatures;
 
 		device_create_info.enabledExtensionCount = 0;
@@ -76,6 +87,7 @@ namespace vulkan {
 		}
 
 		vkGetDeviceQueue(device, queue_family_indices.graphicsFamily.value(), 0, &graphicsQueue);
+		vkGetDeviceQueue(device, queue_family_indices.presentFamily.value(), 0, &presentQueue);
 	}
 
 	void Engine::mainLoop() {
@@ -90,6 +102,7 @@ namespace vulkan {
 		if (enableValidationLayers) {
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 		}
+		vkDestroySurfaceKHR(instance, surface, nullptr);
 		vkDestroyInstance(instance, nullptr);
 
 		glfwDestroyWindow(window);
@@ -132,6 +145,12 @@ namespace vulkan {
 
 		if (vkCreateInstance(&instance_create_info, nullptr, &instance) != VK_SUCCESS) {
 			throw std::runtime_error("Cannot create instance");
+		}
+	}
+
+	void Engine::createSurface() {
+		if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create window surface!");
 		}
 	}
 
