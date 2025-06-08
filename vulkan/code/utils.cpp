@@ -1,6 +1,7 @@
 #include <iostream>
-#include <vector>
+#include <algorithm>
 #include <cstring>
+#include <cassert>
 
 #include "utils.h"
 
@@ -71,6 +72,7 @@ namespace vulkan {
 
 		return extensions;
 	}
+
 	void printRequiredExtension() {
 		std::vector<const char*> required_extensions = getRequiredExtension();
 		std::cout << "Required extension : ";
@@ -124,6 +126,32 @@ namespace vulkan {
 			return false;
 		}
 
+		// check for device extennsion support
+		uint32_t extension_count = 0;
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, nullptr);
+
+		std::vector<VkExtensionProperties> extension{ extension_count };
+		vkEnumerateDeviceExtensionProperties(device, nullptr, &extension_count, extension.data());
+
+		for (const char* required_extension : deviceExtensions) {
+			bool found = false;
+			for (const VkExtensionProperties& available_device_extension : extension) {
+				if (strcmp(required_extension, available_device_extension.extensionName) == 0) {
+					found = true;
+					break;
+				}
+			}
+			if (found == false) {
+				return false;
+			}
+		}
+
+		SwapChainSupportDetails swap_chain_details = querySwapChainSupport(device, surface);
+		if (swap_chain_details.formats.size() < 1 || swap_chain_details.presentModes.size() < 1) {
+			return false;
+		}
+
+
 		return true;
 	}
 
@@ -156,9 +184,68 @@ namespace vulkan {
 		return indices;
 	}
 
+	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR surface)
+	{
+		SwapChainSupportDetails details;
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+
+		uint32_t surface_format_count = 0;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &surface_format_count, nullptr);
+		details.formats.resize(surface_format_count);
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &surface_format_count, details.formats.data());
+
+		uint32_t present_modes = 0;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_modes, nullptr);
+		details.presentModes.resize(present_modes);
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &present_modes, details.presentModes.data());
+
+		return details;
+	}
+
 	void printPhysicalDeviceInfo(const VkPhysicalDevice& device) {
 		VkPhysicalDeviceProperties device_properties{};
 		vkGetPhysicalDeviceProperties(device, &device_properties);
-		std::cout << "Selected GPU : " << device_properties.deviceName << " " << device_properties.deviceType;
+		assert(device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU);
+		std::cout << "Selected GPU : " << device_properties.deviceName << "\n";
+	}
+
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+		for (const auto& availableFormat : availableFormats) {
+			if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
+				return availableFormat;
+			}
+		}
+
+		return availableFormats[0];
+	}
+
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+		for (const auto& availablePresentMode : availablePresentModes) {
+			if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
+				return availablePresentMode;
+			}
+		}
+
+		return VK_PRESENT_MODE_FIFO_KHR;
+	}
+
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities, GLFWwindow* window) {
+		if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+			return capabilities.currentExtent;
+		}
+		else {
+			int width, height;
+			glfwGetFramebufferSize(window, &width, &height);
+
+			VkExtent2D actualExtent = {
+				static_cast<uint32_t>(width),
+				static_cast<uint32_t>(height)
+			};
+
+			actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
+			actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
+
+			return actualExtent;
+		}
 	}
 } // namespace vulkan

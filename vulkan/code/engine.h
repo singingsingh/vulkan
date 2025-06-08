@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -20,6 +22,7 @@ namespace vulkan {
 		void setupDebugMessenger();
 		void pickPhysicalDevice();
 		void createLogicalDevice();
+		void createSwapChain();
 
 		static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -37,5 +40,9 @@ namespace vulkan {
 		VkQueue graphicsQueue;
 		VkQueue presentQueue;
 		VkSurfaceKHR surface;
+		VkSwapchainKHR swapChain;
+		std::vector<VkImage> swapChainImages{};
+		VkFormat swapChainImageFormat;
+		VkExtent2D swapChainExtent;
 	};
 } // namespace vulkan
