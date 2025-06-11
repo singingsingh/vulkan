@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <cstdint>
 
 namespace vulkan {
 	class Engine {
@@ -28,7 +29,7 @@ namespace vulkan {
 		void createGraphicsPipeline();
 		void createFramebuffers();
 		void createCommandPool();
-		void createCommandBuffer();
+		void createCommandBuffers();
 		void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 		void drawFrame();
 		void createSyncObjects();
@@ -59,9 +60,10 @@ namespace vulkan {
 		VkPipeline graphicsPipeline;
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 		VkCommandPool commandPool;
-		VkCommandBuffer commandBuffer;
-		VkSemaphore imageAvailableSemaphore;
-		VkSemaphore renderFinishedSemaphore;
-		VkFence inFlightFence;
+		std::vector<VkCommandBuffer> commandBuffers;
+		std::vector<VkSemaphore> imageAvailableSemaphores;
+		std::vector<VkSemaphore> renderFinishedSemaphores;
+		std::vector<VkFence> inFlightFences;
+		uint32_t currentFrame = 0;
 	};
 } // namespace vulkan
