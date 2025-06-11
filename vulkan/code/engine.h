@@ -15,6 +15,7 @@ namespace vulkan {
 
 	private:
 		void initWindow();
+		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 		void initVulkan();
 		void mainLoop();
 		void cleanup();
@@ -33,6 +34,8 @@ namespace vulkan {
 		void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 		void drawFrame();
 		void createSyncObjects();
+		void recreateSwapChain();
+		void cleanupSwapChain();
 
 		static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -65,5 +68,6 @@ namespace vulkan {
 		std::vector<VkSemaphore> renderFinishedSemaphores;
 		std::vector<VkFence> inFlightFences;
 		uint32_t currentFrame = 0;
+		bool framebufferResized = false;
 	};
 } // namespace vulkan
