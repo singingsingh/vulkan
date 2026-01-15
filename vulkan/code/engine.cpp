@@ -24,6 +24,7 @@ namespace vulkan {
 
 	void Engine::initVulkan()
 	{
+		createInstance();
 	}
 
 	void Engine::mainLoop()

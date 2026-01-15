@@ -19,7 +19,6 @@ namespace vulkan {
 			initVulkan();
 			mainLoop();
 			cleanUp();
-			createInstance();
 		}
 
 	private:

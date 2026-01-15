@@ -11,7 +11,7 @@ namespace vulkan
 		vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, extensions.data());
 
 		for (uint32_t i = 0; i < extension_count; i++) {
-			std::cout << "\nExtension Name " << extensions[i].extensionName;
+			std::cout << "Extension Name " << extensions[i].extensionName << "\n";
 		}		
 	}
 }
