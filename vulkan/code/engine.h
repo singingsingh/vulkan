@@ -31,6 +31,7 @@ namespace vulkan {
 		void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 		void pickPhysicalDevice();
 		bool isDeviceSuitable(VkPhysicalDevice device);
+		void createLogicalDevice();
 
 		static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 			VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -45,7 +46,7 @@ namespace vulkan {
 
 	private:
 		struct QueueFamilyIndices {
-			uint32_t graphicsFamily;
+			int32_t graphicsFamily = -1;
 		};
 
 		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
@@ -54,6 +55,8 @@ namespace vulkan {
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+		VkDevice device = VK_NULL_HANDLE;
+		VkQueue graphicsQueue;
 
 #ifdef NDEBUG
 		const bool enableValidationLayers = false;
